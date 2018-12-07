@@ -49,7 +49,7 @@ const frag = glsl(/* glsl */`
       float y = sqrt(sub.x * sub.x + sub.y * sub.y) * 6.0;
 
       // gl_FragColor = vec4(vec3(smoothstep(0.1, 0.15, y)),1.0);
-      gl_FragColor = vec4(mapRainbowColor( mod(y + time * 2.,2.*PI) ),1.0);
+      gl_FragColor = vec4(mapRainbowColor( mod(y + time * 5.,2.*PI) ),1.0);
   }
 `);
 
