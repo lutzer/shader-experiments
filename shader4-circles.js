@@ -44,11 +44,11 @@ const frag = glsl(/* glsl */`
     float c1 = circle(vec2(0.25), radius, vUv);
     color = mix(color, red , c1);
 
-    float c2 = circle(vec2(0.75, sin(time) * 0.5 + 0.5), 0.2, vUv);
+    float c2 = circle(vec2(0.75, sin(time * 0.5) * 0.5 + 0.5), 0.2, vUv);
     color = mix(color, yellow , c2);
 
-    float s3 = pow(distance(vUv,vec2(0.5,sin(time))),distance(vUv,vec2(sin(time) * 0.5,0.9)));
-    color = mix(color, blue , step(mod(s3,0.04),sin(time * 1.) * 0.02 + 0.01));
+    float s3 = pow(distance(vUv,vec2(0.5,sin(time))),distance(vUv,vec2(sin(time) * 0.5,0.5)));
+    color = mix(color, blue , step(mod(s3,0.04),sin(time * 1.) * 0.01 + 0.02));
 
     gl_FragColor = vec4(color,1.0);
     
