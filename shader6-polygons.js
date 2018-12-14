@@ -15,54 +15,50 @@ const frag = glsl(/* glsl */`
 precision highp float;
 
 #define PI 3.14159265359
+#define TWO_PI 6.28318530718
 
 uniform float time;
 varying vec2 vUv;
 uniform float aspect;
 
 uniform vec3 background;
-uniform vec3 red;
-uniform vec3 yellow;
-uniform vec3 blue;
+uniform vec3 foreground;
 
-float stroke(vec2 st, float pct){
-	return  smoothstep( pct-0.05, pct, st.y) -
-	smoothstep( pct, pct+0.05, st.y);
+float polygon(vec2 c, float s, int n, vec2 st){
+	// Remap the space to -1. to 1.
+	st = (c-st) *2.;
+
+	// Angle and radius from the current pixel
+	float a = atan(st.x,st.y)+PI;
+	float r = TWO_PI/float(n);
+
+	// Shaping function that modulate the distance
+	float d = cos(floor(.5+a/r)*r-a)*length(st);
+
+	return 1.0-smoothstep(s,s+0.01,d);
 }
 
-float func(float x) {
-	return abs(cos(x*3.));
+float circle(vec2 center, float radius, vec2 st) {
+    vec2 toCenter = center-st;
+    return step(length(toCenter), radius);
 }
 
 void main(){
-	vec3 color = vec3(0.0);
-	
-	vec2 pos = vec2(0.25)-vUv;
-	float r = length(pos)*1.0;
-	float a = atan(pos.y,pos.x);
-	
-	// FIRST SNOWFLAKE
-	float f = a;
-	float f1 = abs(cos(a*3. +time * 10.));
-	float f2 = step(r,0.2) - step(r, 0.1);
-	f = min(f1,f2);
-	float f3 = abs(cos(a*12.*sin(time))*sin(a*3.))*.8+.1;
-	f = min(f,f3);
-	color = vec3( 1.-smoothstep(f,f+0.02,r) );
+	vec3 color = background;
 
-	pos = vec2(0.75)-vUv;
-	r = length(pos)*1.0;
-	a = atan(pos.y,pos.x);
-	f1 = smoothstep(-0.9,2., cos(a*10.))*0.05+0.1;
-	f2 = -sin(a*10.)*0.1;
-	f = f2;
-	color += vec3(1.-step(f,r-0.05) );
+	float t = polygon(vec2(0.5), 0.4, 3, vUv);
+	color= mix(color, vec3(255,0,0),t);
+
+	vec2 c = abs(fract(vUv * 16.) - 0.5);
+	float r = sin(vUv.y*PI) * 0.2 * (sin(vUv.x*PI) + 1.0);
+	// r *= step(0.25,length(vUv - 0.5));
+	float d = step(r,length(c));
+
+ 	color= mix(color, foreground,1.-d);
+
+	
 
 
-	// plot function
-	// float s = stroke(vec2(f),r);
-	// color = mix(color, vec3(1.,1.,1.), s);
-	
 	gl_FragColor = vec4(color, 1.0);
 }
 `);
@@ -80,10 +76,8 @@ const sketch =  ({ gl }) => {
 			// Expose props from canvas-sketch
 			aspect: ({ width, height}) => width/height,
 			time: ({ time }) => time,
-			background: () => rgbToVec3(242, 235, 218),
-			red: () => rgbToVec3(164, 33, 39),
-			yellow: () => rgbToVec3(245, 200, 93),
-			blue: () => rgbToVec3(12, 95, 153)
+			background: () => rgbToVec3(245, 241, 232),
+			foreground: () => rgbToVec3(0, 0, 0)
 		}
 	});
 };
