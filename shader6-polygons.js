@@ -56,9 +56,6 @@ void main(){
 
  	color= mix(color, foreground,1.-d);
 
-	
-
-
 	gl_FragColor = vec4(color, 1.0);
 }
 `);
