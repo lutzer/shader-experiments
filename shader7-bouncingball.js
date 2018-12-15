@@ -24,37 +24,41 @@ uniform float aspect;
 uniform vec3 background;
 uniform vec3 foreground;
 
-float circle(vec2 center, float radius, vec2 st) {
-    vec2 toCenter = center-st;
-    return step(length(toCenter), radius);
+float circle(float radius, vec2 st) {
+    return step(radius, length(st));
 }
 
-float box(in vec2 _st, in vec2 _size){
-    _size = vec2(0.5) - _size*0.5;
-    vec2 uv = smoothstep(_size,
-                        _size+vec2(0.001),
-                        _st);
-    uv *= smoothstep(_size,
-                    _size+vec2(0.001),
-                    vec2(1.0)-_st);
-    return uv.x*uv.y;
+float box(vec2 size, vec2 st){
+	vec2 bl = step(-size/2., st);
+	vec2 ul = step(st,size/2.);
+	return bl.x * bl.y * ul.x * ul.y;
 }
 
-float cross(vec2 center, float _size, vec2 st ){
-	vec2 pos = st - center;
-    return  box(st, vec2(_size,_size/4.)) +
-            box(st, vec2(_size/4.,_size));
+float cross(float size, vec2 st ){
+    return box(vec2(size,size/4.), st) +
+		box(vec2(size/4.,size), st);
 }
 
+mat2 rotate2d(float _angle){
+    return mat2(cos(_angle),-sin(_angle),
+                sin(_angle),cos(_angle));
+}
 
 void main(){
 	vec3 color = background;
 
 	float t = mod(time,1.0);
-	vec2 pos = vec2(t,abs(cos(t*TWO_PI) * pow(1.0-t,0.3)));
-	//vec2 pos = vec2(0.5);
-     
-	float f = circle(pos, 0.05, vUv);
+	vec2 translate = vec2(t,abs(cos(t*TWO_PI) * pow(1.0-t,0.3)));
+	//translate = vec2(0.5,0.5);
+	//translate = fract(translate * vec2(2.,1.));
+    
+	// shift coordinate to center
+	vec2 st = vUv - translate;
+
+	// rotate
+	st = rotate2d( -t*2.*PI ) * st;
+	float f = cross(0.1, st);
+	f += circle(0.04, st) - circle(0.06, st);
 
 	color = mix(color,vec3(0.),f);
 
