@@ -57,17 +57,25 @@ void main(){
 
 	// create stars
 	float s = 0.83 + sin(time) * 0.015;
-	float f = smoothstep(s, s + 0.2, p1);
-	color = mix(color,vec3(0.7), f);
+	float f1 = smoothstep(s, s + 0.2, p1);
+	color = mix(color,vec3(0.7), f1);
 
 	// create overbright areas
-	f = smoothstep(s + 0.13, s + 0.16, p1);
+	float f = smoothstep(s + 0.13, s + 0.16, p1);
 	color = mix(color, vec3(1.), f);
 
 	// some shooting stars
-	st = r2d(noise(vec4(st*0.5,0.0,time * 0.5)) * PI) * st;
+	st = r2d(noise(vec4(st*.1,0.0,time * .1)) * PI) * st;
 	f = distanceToLine(vec2(0.,0.5), vec2(1.0,0.5), st);
-	color += vec3(step(f,0.001) * 0.5);
+	float l = 0.;
+	for (float i=0.;i < 30.; i++) {
+		l += step(i/90. - 0.001,1.0-f) * step(1.0-f,i/90. + 0.001) * i/20.;
+	}
+	color = mix(color,vec3(1.0),l);
+
+	//when a line crosses a star
+	// color = mix(color,vec3(255.),l*f1);
+		
 
 	gl_FragColor = vec4(color, 1.0);
 }
