@@ -65,13 +65,13 @@ void main(){
 	color = mix(color, vec3(1.), f);
 
 	// some shooting stars
-	st = r2d(noise(vec4(st*.1,0.0,time * .1)) * PI) * st;
-	f = distanceToLine(vec2(0.,0.5), vec2(1.0,0.5), st);
-	float l = 0.;
-	for (float i=0.;i < 30.; i++) {
-		l += step(i/90. - 0.001,1.0-f) * step(1.0-f,i/90. + 0.001) * i/20.;
-	}
-	color = mix(color,vec3(1.0),l);
+	// st = r2d(noise(vec4(st*.1,0.0,time * .1)) * PI) * st;
+	// f = distanceToLine(vec2(0.,0.5), vec2(1.0,0.5), st);
+	// float l = 0.;
+	// for (float i=0.;i < 30.; i++) {
+	// 	l += step(i/90. - 0.001,1.0-f) * step(1.0-f,i/90. + 0.001) * i/20.;
+	// }
+	// color = mix(color,vec3(1.0),l);
 
 	//when a line crosses a star
 	// color = mix(color,vec3(255.),l*f1);
