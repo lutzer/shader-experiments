@@ -26,6 +26,12 @@ uniform float aspect;
 uniform vec3 background;
 uniform vec3 foreground;
 
+
+float adiff(in float a, in float b) {\
+    float diff = a-b;
+    return mod(diff + PI, TWO_PI) - PI;\
+}
+
 float circle(float radius, const vec2 st) {
     return smoothstep(length(st), length(st) + SMOOTHING, radius);
 }
@@ -50,8 +56,7 @@ float arc(float radius, float start, float end, float thickness, const vec2 st) 
     float f = circle(radius + thickness, st) - circle(radius, st);
     float a = atan(st.y,st.x);
     a = mod(a+TWO_PI, TWO_PI);
-    f =  (a > start && (a < end) || (start > end) && ((a > start) || (a < end) )) ? f : 0.0;
-    // f =  (a > start && (a < end) || (end > TWO_PI) && (a < end - TWO_PI) ) ? f : 0.0;
+    f = (adiff(a, start) > 0.0 && adiff(a, start) < adiff(end,start)) ? f : 0.0;
     return f;
 }
 
@@ -59,8 +64,8 @@ float pie(float radius, float start, float end, const vec2 st) {
     float f = circle(radius, st);
     float a = atan(st.y,st.x);
     a = mod(a+TWO_PI, TWO_PI);
-    // f = (a > start && (a < end) || (start > end) && ((a > start) || (a < end) )) ? f : 0.0;
-    f = f * abs(start-a) / (end-start);
+    f *= max(adiff(a, start) / adiff(end,start), 0.0);
+    f = (f > 1.0) ? 0.0 : f;
     return f;
 }
 
@@ -74,7 +79,7 @@ void main(){
 
     // translate to center
     vec2 st = vUv;
-    // vec2 st = fract(vUv * 3.0);
+    // st = fract(vUv * 2.0);
     st -= vec2(0.5);
 
     float f = circle(0.41, st) - circle(0.4, st);
@@ -83,11 +88,11 @@ void main(){
 
     // radar line
     float a = mod(-time,TWO_PI);
-    // f = line(vec2(0.0), vec2(cos(a),sin(a)) * 0.4, STROKE_WIDTH, st);
-    // color = mix(color, foreground, f);
+    f = line(vec2(0.0), vec2(cos(a),sin(a)) * 0.4, STROKE_WIDTH, st);
+    color = mix(color, foreground, f);
 
     //radar pie
-    f = pie(0.41, a, mod(a + 0.9,TWO_PI), st);
+    f = pie(0.41, mod(a + 0.9,TWO_PI), a, st);
     color = mix(color, foreground, f);
 
     // two circling lines
