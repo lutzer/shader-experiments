@@ -69,7 +69,6 @@ void main(){
 	float f = distanceToLine(vec2(0.,0.5), vec2(1.0,0.5), st2);
 	float l = step(0.1 - 0.1, 1.0-f) * step(1.0-f, 0.1 + 0.1) * 0.1;
 	color = mix(color,vec3(1.0,0.,0.),l * p1);
-
 	
 
 	//when a line crosses a star
