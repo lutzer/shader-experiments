@@ -61,17 +61,16 @@ void main(){
 	color = mix(color,vec3(0.7), f1);
 
 	// create overbright areas
-	float f = smoothstep(s + 0.13, s + 0.16, p1);
-	color = mix(color, vec3(1.), f);
+	float f2 = smoothstep(s + 0.13, s + 0.16, p1);
+	color = mix(color, vec3(1.), f2);
 
-	// some shooting stars
-	st = r2d(noise(vec4(st*.1,0.0,time * .1)) * PI) * st;
-	f = distanceToLine(vec2(0.,0.5), vec2(1.0,0.5), st);
-	float l = 0.;
-	for (float i=0.;i < 30.; i++) {
-		l += step(i/90. - 0.001,1.0-f) * step(1.0-f,i/90. + 0.001) * i/20.;
-	}
-	color = mix(color,vec3(1.0),l);
+	// add some star discovering lines
+	vec2 st2 = r2d(noise(vec4(st*.1,0.0,time * .5)) * PI) * st;
+	float f = distanceToLine(vec2(0.,0.5), vec2(1.0,0.5), st2);
+	float l = step(0.1 - 0.1, 1.0-f) * step(1.0-f, 0.1 + 0.1) * 0.1;
+	color = mix(color,vec3(1.0,0.,0.),l * p1);
+
+	
 
 	//when a line crosses a star
 	// color = mix(color,vec3(255.),l*f1);
